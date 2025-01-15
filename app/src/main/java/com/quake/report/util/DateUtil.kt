@@ -3,6 +3,7 @@ package com.quake.report.util
 import android.text.format.DateFormat
 import com.quake.report.util.Constants.DATE_FORMAT
 import com.quake.report.util.Constants.DATE_FORMAT_DAY
+import com.quake.report.util.Constants.DATE_FORMAT_MONTH
 import com.quake.report.util.Constants.LOCALE
 import java.math.RoundingMode
 import java.text.DecimalFormat
@@ -39,6 +40,17 @@ fun getLastSixMonths(): ArrayList<String> {
     cal.add(Calendar.MONTH, -6)
     for (i in 0 until 7) {
         dates.add(SimpleDateFormat(DATE_FORMAT, Locale.getDefault()).format(cal.time))
+        cal.add(Calendar.MONTH, 1)
+    }
+    return dates
+}
+
+fun getLastSixMonthsNames(): ArrayList<String> {
+    val cal: Calendar = Calendar.getInstance()
+    val dates: ArrayList<String> = arrayListOf()
+    cal.add(Calendar.MONTH, -6)
+    for (i in 0 until 7) {
+        dates.add(SimpleDateFormat(DATE_FORMAT_MONTH, Locale.getDefault()).format(cal.time))
         cal.add(Calendar.MONTH, 1)
     }
     return dates

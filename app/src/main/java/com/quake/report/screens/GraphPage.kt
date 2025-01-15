@@ -1,17 +1,25 @@
 package com.quake.report.screens
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.jaikeerthick.composable_graphs.composables.bar.BarGraph
 import com.jaikeerthick.composable_graphs.composables.bar.model.BarData
 import com.jaikeerthick.composable_graphs.composables.bar.style.BarGraphColors
@@ -28,6 +36,9 @@ import com.quake.report.ui.theme.yellow2
 import com.quake.report.ui.theme.orange
 import com.quake.report.ui.theme.red
 import com.quake.report.util.getGraphNames
+import com.quake.report.util.getLastFourWeekDates
+import com.quake.report.util.getLastSixMonths
+import com.quake.report.util.getLastSixMonthsNames
 
 
 @Composable
@@ -61,41 +72,54 @@ fun BottomNavGraph(action: () -> Unit) {
     // basliklar ekle
 
 
-
-
-    action.invoke()
+    val context = LocalContext.current
     val data = MainActivity.countList
+    val fourWeeks = MainActivity.fourWeeksCountList
+    val monthlyData = MainActivity.monthlyCountList
 
 
-
-    val data2 = listOf(
-        LineData(x = getGraphNames()[0], y = data[0]),
-        LineData(x = getGraphNames()[1], y = data[1]),
-        LineData(x = getGraphNames()[2], y = data[2]),
-        LineData(x = getGraphNames()[3], y = data[3]),
-        LineData(x = getGraphNames()[4], y = data[4]),
-        LineData(x = getGraphNames()[5], y = data[5]),
-        LineData(x = getGraphNames()[6], y = data[6]),
+    val fourWeeksData = listOf(
+        LineData(x = getLastFourWeekDates()[1], y = fourWeeks[0]),
+        LineData(x = getLastFourWeekDates()[2], y = fourWeeks[1]),
+        LineData(x = getLastFourWeekDates()[3], y = fourWeeks[2]),
+        LineData(x = "this week", y = fourWeeks[3]),
     )
-
-    val data3 = listOf(
-        BarData(x = "Mon", y = data[0]),
-        BarData(x = "Tue", y = data[1]),
-        BarData(x = "Wed", y = data[2]),
-        BarData(x = "Thu", y = data[3]),
-        BarData(x = "Fri", y = data[4]),
-        BarData(x = "Sat", y = data[5]),
-        BarData(x = "Sun", y = data[6])
+    val weeklyData = listOf(
+        BarData(x = getGraphNames()[0], y = data[0]),
+        BarData(x = getGraphNames()[1], y = data[1]),
+        BarData(x = getGraphNames()[2], y = data[2]),
+        BarData(x = getGraphNames()[3], y = data[3]),
+        BarData(x = getGraphNames()[4], y = data[4]),
+        BarData(x = getGraphNames()[5], y = data[5]),
+        BarData(x = getGraphNames()[6], y = data[6])
+    )
+    val monthData = listOf(
+        BarData(x = getLastSixMonthsNames()[0], y = monthlyData[0]),
+        BarData(x = getLastSixMonthsNames()[1], y = monthlyData[1]),
+        BarData(x = getLastSixMonthsNames()[2], y = monthlyData[2]),
+        BarData(x = getLastSixMonthsNames()[3], y = monthlyData[3]),
+        BarData(x = getLastSixMonthsNames()[4], y = monthlyData[4]),
+        BarData(x = getLastSixMonthsNames()[5], y = monthlyData[5]),
     )
 
 
     ChartDemoItems(
         listOf {
+
+            Row(
+                verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.Start,
+                modifier = Modifier.padding(20.dp)
+            ) {
+                Text(
+                    text = "This Week", fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
             BarGraph(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 16.dp),
-                data = data3,
+                data = weeklyData,
                 style = BarGraphStyle(
                     colors = BarGraphColors(
                         fillType = BarGraphFillType.Gradient(
@@ -106,13 +130,25 @@ fun BottomNavGraph(action: () -> Unit) {
                             )
                         )
                     )
-                )
+                ),
+                onBarClick = { value: BarData ->
+                    Toast.makeText(context, value.y.toString(), Toast.LENGTH_LONG).show()
+                }
             )
+            Row(
+                verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.Start,
+                modifier = Modifier.padding(20.dp)
+            ) {
+                Text(
+                    text = "This Month", fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
 
             LineGraph(
                 modifier = Modifier
                     .padding(horizontal = 16.dp, vertical = 16.dp),
-                data = data2,
+                data = fourWeeksData,
                 style = LineGraphStyle(
                     LineGraphColors(
                         lineColor = red,
@@ -135,13 +171,41 @@ fun BottomNavGraph(action: () -> Unit) {
 
 
                     )
-//                    val colors: LineGraphColors = LineGraphColors(),
-//                val visibility: LineGraphVisibility = LineGraphVisibility(),
-//            val yAxisLabelPosition: LabelPosition = LabelPosition.RIGHT
                 ),
                 onPointClick = { value: LineData ->
-                    Log.d("", "")
+                    Toast.makeText(context, value.y.toString(), Toast.LENGTH_LONG).show()
                 },
+            )
+
+            Row(
+                verticalAlignment = Alignment.Top, horizontalArrangement = Arrangement.Start,
+                modifier = Modifier.padding(20.dp)
+            ) {
+                Text(
+                    text = "Last Six Months", fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            BarGraph(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 16.dp),
+                data = monthData,
+                style = BarGraphStyle(
+                    colors = BarGraphColors(
+                        fillType = BarGraphFillType.Gradient(
+                            Brush.verticalGradient(
+                                listOf(
+                                    red, orange
+                                )
+                            )
+                        )
+                    )
+                ),
+                onBarClick = { value: BarData ->
+                    Toast.makeText(context, value.y.toString(), Toast.LENGTH_LONG).show()
+                }
             )
         }
     )
