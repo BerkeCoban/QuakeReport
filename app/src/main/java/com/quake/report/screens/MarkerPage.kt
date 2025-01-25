@@ -3,8 +3,7 @@ package com.quake.report.screens
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.drawable.Drawable
-import android.os.Handler
-import android.os.Looper
+import android.location.Location
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -46,12 +45,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.quake.report.MainActivity
 import com.quake.report.MainActivity.Companion.splashData
 import com.quake.report.MainViewModel
 import com.quake.report.R
-import com.quake.report.data.ResponseMapper
-import com.quake.report.navigation.Screen
+import com.quake.report.data.model.UiResponse
 import com.quake.report.osm.MarkerLabeled
 import com.quake.report.osm.OpenStreetMap
 import com.quake.report.osm.model.LabelProperties
@@ -62,6 +59,7 @@ import com.quake.report.screens.components.LineSlider
 import com.quake.report.ui.theme.buttonColor
 import com.quake.report.ui.theme.green1
 import com.quake.report.ui.theme.lightYellow
+import com.quake.report.util.Constants.CLUSTER_RANGE
 import com.quake.report.util.convertDateWithoutHours
 import org.osmdroid.util.GeoPoint
 
@@ -71,9 +69,9 @@ fun MarkerPage(navController: NavController) {
 
     val viewModel = viewModel<MainViewModel>()
 
+    // onemli min magnitude 1 den baslayacak
+    // ana sebep grup yapilmis markerlarin mesafesine bakiyor muyuz ?
 
-
-    // 86400000 fark mili saniye her gun arasinda
     // hint duzeltilebilir click to select date gibi
     // https://stackoverflow.com/questions/75377259/how-to-change-datepicker-dialog-color-in-jetpack-compose
     // servis  min mag 4.5 seklinde calisiyor belki kusuratli filtreleme ekleyebiliriz.
@@ -82,10 +80,13 @@ fun MarkerPage(navController: NavController) {
     // cluster sorunu ve markera basinca cikan dialog , marker gorunumu
     // butona surekli basilmasin istek atma olayi
     // loading cikarma servislerde
+    // stateler tarih text magnitude map zoom hersey gidip geldigimizde ayni kalmali hide show
     // tarih sectikten sonra bottomdan gidip gelince kalmiyor sanki kaliyor ama textte tarih gidiyor gibi kontrol et
     // tarih secilmedi ise istek attirma uyari ver
     // buton ismi go mu kalsin
     // TARIH secip go dedikten sonra veri gelmesse uyari goster
+    // min magnitude 0 a alinca okunmuyor
+    // markerda magnitude 2 den fazla virgulle gelebiliyor
 
     val overlayManagerState = rememberOverlayManagerState()
     val context = LocalContext.current
@@ -118,6 +119,8 @@ fun MarkerPage(navController: NavController) {
         }
         key(viewModel.splashData.observeAsState().value) {
             val data = splashData
+            val clusterIndexList = getClusterGroups(splashData)
+
             val cameraState = rememberCameraState {
                 geoPoint = GeoPoint(data[0].latitude!!, data[0].longitude!!)
                 zoom = 0.0
@@ -127,16 +130,16 @@ fun MarkerPage(navController: NavController) {
                     cameraState = cameraState,
                     overlayManagerState = overlayManagerState
                 ) {
-                    data?.forEach { markerData ->
-                        markerData.latitude?.let {
-                            markerData.longitude?.let { it1 ->
-                                GeoPoint(
-                                    it,
-                                    it1
-                                )
-                            }
-                        }
-                            ?.let {
+                    data.forEachIndexed { index, markerData ->
+                        if (isMarkerValid(index, clusterIndexList)) {
+                            markerData.latitude?.let {
+                                markerData.longitude?.let { it1 ->
+                                    GeoPoint(
+                                        it,
+                                        it1
+                                    )
+                                }
+                            }?.let {
                                 rememberMarkerState(
                                     geoPoint = it,
                                     rotation = 0f
@@ -165,14 +168,67 @@ fun MarkerPage(navController: NavController) {
                                     }
                                 }
                             }
+                        }
                     }
                 }
             }
         }
-
     }
 }
 
+fun isMarkerValid(
+    index: Int,
+    clusterIndexList: HashMap<Int, ArrayList<Int>>
+): Boolean {
+    for ((key, value) in clusterIndexList) {
+        value.forEach {
+            if (index == it) {
+                return false
+            }
+        }
+    }
+    return true
+}
+
+fun getClusterGroups(data: ArrayList<UiResponse>): HashMap<Int, ArrayList<Int>> {
+    val results = FloatArray(1)
+    val indexList = arrayListOf<Int>()
+    val clusterHashMap = hashMapOf<Int, ArrayList<Int>>()
+    val duplicateList = arrayListOf<Int>()
+    data.forEachIndexed { index, item ->
+        data.forEachIndexed { innerIndex, innerItem ->
+            if (index != innerIndex) {
+                Location.distanceBetween(
+                    innerItem.latitude!!,
+                    innerItem.longitude!!,
+                    item.latitude!!,
+                    item.longitude!!, results
+                )
+                val distance = try {
+                    Integer.valueOf(
+                        results[0].toInt().toString().substringBefore("E")
+                    )
+                } catch (e: Exception) {
+                    0
+                }
+                if (distance < CLUSTER_RANGE) {
+                    indexList.add(innerIndex)
+                }
+            }
+        }
+        if (indexList.size > 0) {
+            val list = arrayListOf<Int>().apply { addAll(indexList) }
+            if (!duplicateList.contains(index)) {
+                clusterHashMap[index] = list
+                list.forEach { indices ->
+                    if (!duplicateList.contains(indices)) duplicateList.add(indices)
+                }
+            }
+        }
+        indexList.clear()
+    }
+    return clusterHashMap
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -182,12 +238,7 @@ fun SearchBox(viewModel: MainViewModel) {
     var magnitudeValue by remember { mutableFloatStateOf(.4f) }
     var dateText by remember { mutableStateOf("yyyy-mm-dd") }
     var selectedDateEpoch by remember { mutableStateOf(0L) }
-
     var cardHeight by remember { mutableIntStateOf(200) }
-
-
-
-
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -214,8 +265,9 @@ fun SearchBox(viewModel: MainViewModel) {
                                     )).toString()
                                 )
 
-                               selectedDateEpoch = dateState.selectedDateMillis?.plus(
-                                   86400000)!!
+                                selectedDateEpoch = dateState.selectedDateMillis?.plus(
+                                    86400000
+                                )!!
 
                             }
                         ) {
@@ -320,7 +372,7 @@ fun SearchBox(viewModel: MainViewModel) {
                                     86400000
                                 )).toString()
                             ),
-                            minMagnitude = (magnitudeValue*10).toString()
+                            minMagnitude = (magnitudeValue * 10).toString()
                         )
                     }, shape = RoundedCornerShape(50),
                     colors = ButtonDefaults.buttonColors(containerColor = buttonColor)

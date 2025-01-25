@@ -21,8 +21,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.quake.report.R
-import com.quake.report.screens.BottomNavGraph
-import com.quake.report.screens.BottomNavList
+import com.quake.report.screens.BottomNavGraphPage
+import com.quake.report.screens.BottomNavListPage
 import com.quake.report.screens.MarkerPage
 
 
@@ -113,11 +113,11 @@ fun BottomBarNavigation(navController: NavHostController) {
         NavHost(navController, startDestination = Screen.BottomNavHome.route, modifier = modifier) {
             composable(Screen.BottomNavHome.route) { MarkerPage(navController) }
 
-            composable(route = Screen.BottomNavGraph.route) { BottomNavGraph {
+            composable(route = Screen.BottomNavGraph.route) { BottomNavGraphPage {
                 Log.d("test", "test")
             }
             }
-            composable(route = Screen.BottomNavList.route) { BottomNavList {
+            composable(route = Screen.BottomNavList.route) { BottomNavListPage {
                 Log.d("", "")
             }
             }

@@ -5,6 +5,8 @@ import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.material3.rememberTooltipState
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.quake.report.data.ResponseMapper
@@ -34,6 +36,8 @@ class MainActivity : ComponentActivity() {
     // pull to refresh liste sayfasina olabilir
     // kasmassa mapteki ikonlara animasyon
     // stateler duruyor mu mesala map ekraninda hide dedi gitti geldi
+    // basliga butun dunyadaki count data oldugunu belirt
+    // sonra izlede publish etmeden once video likeladim play store atmak icin
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

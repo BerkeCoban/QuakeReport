@@ -20,9 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.GenericShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Button
@@ -42,8 +40,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.layout
@@ -51,7 +47,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.offset
 import androidx.compose.ui.unit.sp
@@ -69,7 +64,7 @@ import com.quake.report.util.roundOffDecimal
 import org.osmdroid.util.GeoPoint
 
 @Composable
-fun BottomNavList(action: () -> Unit) {
+fun BottomNavListPage(action: () -> Unit) {
 
     // empty view
     // yukari tarih kutucugu vs yada direk home daki daha gosterilsin filtrelenebilir
@@ -79,7 +74,6 @@ fun BottomNavList(action: () -> Unit) {
     // arada sigmayan title oluyor lite viewda texti tek satir yap yada text size kucult
     // lite view ortala titlei
     // bir uyari yazilabilir mapteki data burada gozukuyor gibi
-    // https://foso.github.io/Jetpack-Compose-Playground/animation/crossfade/   animasyon dialog icin
 
     val data = MainActivity.splashData
     val context = LocalContext.current

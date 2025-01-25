@@ -36,19 +36,22 @@ fun getLastFourWeekDates(): ArrayList<String> {
 
 fun getLastSixMonths(): ArrayList<String> {
     val cal: Calendar = Calendar.getInstance()
+    val today = SimpleDateFormat(DATE_FORMAT, Locale.getDefault()).format(cal.time)
     val dates: ArrayList<String> = arrayListOf()
-    cal.add(Calendar.MONTH, -6)
-    for (i in 0 until 7) {
+    cal.set(Calendar.DAY_OF_MONTH, 1)
+    cal.add(Calendar.MONTH, -5)
+    for (i in 0 until 6) {
         dates.add(SimpleDateFormat(DATE_FORMAT, Locale.getDefault()).format(cal.time))
         cal.add(Calendar.MONTH, 1)
     }
+    dates.add(today)
     return dates
 }
 
 fun getLastSixMonthsNames(): ArrayList<String> {
     val cal: Calendar = Calendar.getInstance()
     val dates: ArrayList<String> = arrayListOf()
-    cal.add(Calendar.MONTH, -6)
+    cal.add(Calendar.MONTH, -5)
     for (i in 0 until 7) {
         dates.add(SimpleDateFormat(DATE_FORMAT_MONTH, Locale.getDefault()).format(cal.time))
         cal.add(Calendar.MONTH, 1)
