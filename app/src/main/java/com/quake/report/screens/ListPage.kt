@@ -74,6 +74,8 @@ fun BottomNavListPage(action: () -> Unit) {
     // arada sigmayan title oluyor lite viewda texti tek satir yap yada text size kucult
     // lite view ortala titlei
     // bir uyari yazilabilir mapteki data burada gozukuyor gibi
+    // switch yukarda sabit kalabilir assagi indikce dursun yukarda
+    // show on map ve details icon
 
     val data = MainActivity.splashData
     val context = LocalContext.current

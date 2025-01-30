@@ -44,7 +44,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import com.quake.report.MainActivity.Companion.splashData
 import com.quake.report.MainViewModel
 import com.quake.report.R
@@ -65,12 +64,18 @@ import org.osmdroid.util.GeoPoint
 
 
 @Composable
-fun MarkerPage(navController: NavController) {
+fun MarkerPage() {
 
     val viewModel = viewModel<MainViewModel>()
 
-    // onemli min magnitude 1 den baslayacak
-    // ana sebep grup yapilmis markerlarin mesafesine bakiyor muyuz ?
+    // state konusu , ilk giriste de min mag 3 ve bugunun tarihi yaziyor olacak ilk istek splash
+    // stateler tarih text, min magnitude, map zoom, hide show
+    // https://stackoverflow.com/questions/72913451/how-to-save-and-restore-navigation-state-in-jetpack-compose
+
+
+    // cluster olayini cozduk , ancak tek marker olarak ekledigimiz grupta, kalamnlari da goster
+    // ustune basildiginda siddetler gosterilebilir, ayrica basildigindaki ui duzelt 168
+
 
     // hint duzeltilebilir click to select date gibi
     // https://stackoverflow.com/questions/75377259/how-to-change-datepicker-dialog-color-in-jetpack-compose
@@ -80,13 +85,12 @@ fun MarkerPage(navController: NavController) {
     // cluster sorunu ve markera basinca cikan dialog , marker gorunumu
     // butona surekli basilmasin istek atma olayi
     // loading cikarma servislerde
-    // stateler tarih text magnitude map zoom hersey gidip geldigimizde ayni kalmali hide show
     // tarih sectikten sonra bottomdan gidip gelince kalmiyor sanki kaliyor ama textte tarih gidiyor gibi kontrol et
     // tarih secilmedi ise istek attirma uyari ver
     // buton ismi go mu kalsin
     // TARIH secip go dedikten sonra veri gelmesse uyari goster
     // min magnitude 0 a alinca okunmuyor
-    // markerda magnitude 2 den fazla virgulle gelebiliyor
+    // markerda magnitude 2 den fazla virgulle gelebiliyor teke indir
 
     val overlayManagerState = rememberOverlayManagerState()
     val context = LocalContext.current
@@ -238,7 +242,9 @@ fun SearchBox(viewModel: MainViewModel) {
     var magnitudeValue by remember { mutableFloatStateOf(.4f) }
     var dateText by remember { mutableStateOf("yyyy-mm-dd") }
     var selectedDateEpoch by remember { mutableStateOf(0L) }
+    // hide show bunun uzunluguna bagli
     var cardHeight by remember { mutableIntStateOf(200) }
+
     Box(
         modifier = Modifier
             .fillMaxWidth()

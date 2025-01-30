@@ -33,7 +33,8 @@ fun BottomBarNavigation(navController: NavHostController) {
         bottomBar = {
             BottomNavigation(
                 modifier = Modifier
-                    .height(70.dp).clip(RoundedCornerShape(15.dp, 15.dp, 0.dp, 0.dp)),
+                    .height(70.dp)
+                    .clip(RoundedCornerShape(15.dp, 15.dp, 0.dp, 0.dp)),
                 backgroundColor = Color.White,
                 contentColor = Color.Black
             ) {
@@ -111,15 +112,17 @@ fun BottomBarNavigation(navController: NavHostController) {
     ) { innerPadding ->
         val modifier = Modifier.padding(innerPadding)
         NavHost(navController, startDestination = Screen.BottomNavHome.route, modifier = modifier) {
-            composable(Screen.BottomNavHome.route) { MarkerPage(navController) }
+            composable(Screen.BottomNavHome.route) { MarkerPage() }
 
-            composable(route = Screen.BottomNavGraph.route) { BottomNavGraphPage {
-                Log.d("test", "test")
+            composable(route = Screen.BottomNavGraph.route) {
+                BottomNavGraphPage {
+                    Log.d("test", "test")
+                }
             }
-            }
-            composable(route = Screen.BottomNavList.route) { BottomNavListPage {
-                Log.d("", "")
-            }
+            composable(route = Screen.BottomNavList.route) {
+                BottomNavListPage {
+                    Log.d("", "")
+                }
             }
         }
     }

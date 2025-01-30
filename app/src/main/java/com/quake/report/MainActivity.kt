@@ -5,8 +5,10 @@ import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.material3.rememberTooltipState
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.quake.report.data.ResponseMapper
@@ -28,6 +30,7 @@ class MainActivity : ComponentActivity() {
     private var isCountDataFetched: Boolean = false
     private var isFourWeeksFetched: Boolean = false
     private var isMonthlyCountDataFetched: Boolean = false
+    // https://coolors.co/palettes/maps palette
 
     // cluster konusu  mapte marker basinca default bi gorunum var onu belki gruplarda kullanabiliriz
     // geri butonu ile splashe dönmemeli.
@@ -38,6 +41,7 @@ class MainActivity : ComponentActivity() {
     // stateler duruyor mu mesala map ekraninda hide dedi gitti geldi
     // basliga butun dunyadaki count data oldugunu belirt
     // sonra izlede publish etmeden once video likeladim play store atmak icin
+    // splashte belli bir sure kalirsa uyari mesaji bas
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -108,37 +112,6 @@ class MainActivity : ComponentActivity() {
             minMagnitude = "3"
         )
     }
-
-//    private fun fetchCountLastTwoWeeks() {
-//        val dates = getLastTwoWeek()
-//        var dateCounter = 1
-//        viewModel.countData.observe(this) { data ->
-//            when (dateCounter) {
-//                14 -> {
-//                    countList.add(data)
-//                    viewModel.getCountDataToday(getToday(), "0")
-//                    dateCounter++
-//                }
-//
-//                15 -> {
-//                    countList.add(data)
-//                    isCountDataFetched = true
-//                    navigateToHome()
-//                }
-//
-//                else -> {
-//                    countList.add(data)
-//                    viewModel.getCountData(
-//                        startTime = dates[dateCounter],
-//                        endTime = dates[dateCounter + 1]
-//                    )
-//                    dateCounter++
-//                }
-//            }
-//
-//        }
-//        viewModel.getCountData(startTime = dates[0], endTime = dates[1])
-//    }
 
     private fun fetchCountFourWeeks() {
 
