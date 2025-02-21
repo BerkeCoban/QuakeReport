@@ -27,12 +27,11 @@ class MainViewModel : ViewModel() {
     val monthlyCountData: LiveData<Int> = _monthlyCountData
 
 
-    fun getSplashData(startTime: String, endTime: String, minMagnitude: String) {
+    fun getSplashData(startTime: String, minMagnitude: String) {
         viewModelScope.launch {
             try {
-                val response = apiService.getByDatesAndMagnitude(
+                val response = apiService.getStartDateAndMagnitude(
                     startTime = startTime,
-                    endTime = endTime,
                     minMagnitude = minMagnitude
                 )
                 if (response.features.isNotEmpty()) {

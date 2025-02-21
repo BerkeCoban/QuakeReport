@@ -127,9 +127,3 @@ fun convertDateWithoutHours(dateInMilliseconds: String): String {
         dateInMilliseconds.substringBefore("E").replace(".", "").toLong()
     ).toString()
 }
-
-fun roundOffDecimal(number: Double): Double {
-    val df = DecimalFormat("#.#")
-    df.roundingMode = RoundingMode.CEILING
-    return df.format(number).toDouble()
-}

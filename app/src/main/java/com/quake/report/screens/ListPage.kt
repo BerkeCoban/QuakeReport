@@ -60,7 +60,7 @@ import com.quake.report.ui.theme.magColor
 import com.quake.report.ui.theme.magnitudeColor
 import com.quake.report.util.convertDate
 import com.quake.report.util.convertDateHours
-import com.quake.report.util.roundOffDecimal
+import com.quake.report.util.round
 import org.osmdroid.util.GeoPoint
 
 @Composable
@@ -118,7 +118,9 @@ fun BottomNavListPage(action: () -> Unit) {
     CardList(items = arrayListOf<@Composable () -> Unit>().apply {
         add {
             Row {
-                Button( modifier = Modifier.height(100.dp).width(100.dp),
+                Button( modifier = Modifier
+                    .height(100.dp)
+                    .width(100.dp),
                     onClick = {
                         isLiteViews = !isLiteViews
                     }) {
@@ -332,7 +334,7 @@ fun CustomCard(
 
         }
         Text(
-            text = roundOffDecimal(mag.toDouble()).toString().take(3),
+            text = mag.toDouble().round().toString(),
             color = magColor,
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,

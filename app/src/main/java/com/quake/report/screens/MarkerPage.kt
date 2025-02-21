@@ -35,6 +35,7 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,6 +61,9 @@ import com.quake.report.ui.theme.green1
 import com.quake.report.ui.theme.lightYellow
 import com.quake.report.util.Constants.CLUSTER_RANGE
 import com.quake.report.util.convertDateWithoutHours
+import com.quake.report.util.getToday
+import com.quake.report.util.getYesterday
+import com.quake.report.util.round
 import org.osmdroid.util.GeoPoint
 
 
@@ -68,29 +72,22 @@ fun MarkerPage() {
 
     val viewModel = viewModel<MainViewModel>()
 
-    // state konusu , ilk giriste de min mag 3 ve bugunun tarihi yaziyor olacak ilk istek splash
-    // stateler tarih text, min magnitude, map zoom, hide show
-    // https://stackoverflow.com/questions/72913451/how-to-save-and-restore-navigation-state-in-jetpack-compose
-
 
     // cluster olayini cozduk , ancak tek marker olarak ekledigimiz grupta, kalamnlari da goster
     // ustune basildiginda siddetler gosterilebilir, ayrica basildigindaki ui duzelt 168
 
+    // marker tasarimi ve ustune basinca cikan dialog grup icin kullanilabilir
 
-    // hint duzeltilebilir click to select date gibi
+
     // https://stackoverflow.com/questions/75377259/how-to-change-datepicker-dialog-color-in-jetpack-compose
-    // servis  min mag 4.5 seklinde calisiyor belki kusuratli filtreleme ekleyebiliriz.
-    // tarihe hic dokunmadan ok basinca null basiyor
-    // en yuksek siddetteki depreme kamerayi alabiliriz.
-    // cluster sorunu ve markera basinca cikan dialog , marker gorunumu
+
     // butona surekli basilmasin istek atma olayi
     // loading cikarma servislerde
-    // tarih sectikten sonra bottomdan gidip gelince kalmiyor sanki kaliyor ama textte tarih gidiyor gibi kontrol et
-    // tarih secilmedi ise istek attirma uyari ver
-    // buton ismi go mu kalsin
-    // TARIH secip go dedikten sonra veri gelmesse uyari goster
-    // min magnitude 0 a alinca okunmuyor
-    // markerda magnitude 2 den fazla virgulle gelebiliyor teke indir
+
+
+    // TARIH secip go dedikten sonra veri gelmesse uyari goster eski data kalacaksa resetleme vs yapilabilir
+    // buradaki data ile liste datasini karsilastir, bi baska cozum bos gostermek data yoksa markerlari silmek,
+    // liste ekraninda da empty view
 
     val overlayManagerState = rememberOverlayManagerState()
     val context = LocalContext.current
@@ -154,7 +151,7 @@ fun MarkerPage() {
                                     icon = pinIcon,
                                     title = markerData.title,
                                     snippet = markerData.place,
-                                    label = markerData.magnitude.toString(),
+                                    label = markerData.magnitude?.round().toString(),
                                     labelProperties = labelProperties.value
                                 ) {
                                     Column(
@@ -239,12 +236,11 @@ fun getClusterGroups(data: ArrayList<UiResponse>): HashMap<Int, ArrayList<Int>> 
 fun SearchBox(viewModel: MainViewModel) {
     val dateState = rememberDatePickerState()
     var showDialog by remember { mutableStateOf(false) }
-    var magnitudeValue by remember { mutableFloatStateOf(.4f) }
-    var dateText by remember { mutableStateOf("yyyy-mm-dd") }
+    var magnitudeValue by rememberSaveable { mutableFloatStateOf(.3f) }
+    var dateText by rememberSaveable { mutableStateOf(getToday()) }
     var selectedDateEpoch by remember { mutableStateOf(0L) }
     // hide show bunun uzunluguna bagli
-    var cardHeight by remember { mutableIntStateOf(200) }
-
+    var cardHeight by rememberSaveable { mutableIntStateOf(200) }
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -265,16 +261,16 @@ fun SearchBox(viewModel: MainViewModel) {
                         Button(
                             onClick = {
                                 showDialog = false
-                                dateText = convertDateWithoutHours(
-                                    (dateState.selectedDateMillis?.plus(
+                                if (dateState.selectedDateMillis != null) {
+                                    dateText = convertDateWithoutHours(
+                                        (dateState.selectedDateMillis?.plus(
+                                            86400000
+                                        )).toString()
+                                    )
+                                    selectedDateEpoch = dateState.selectedDateMillis?.plus(
                                         86400000
-                                    )).toString()
-                                )
-
-                                selectedDateEpoch = dateState.selectedDateMillis?.plus(
-                                    86400000
-                                )!!
-
+                                    )!!
+                                }
                             }
                         ) {
                             Text(text = "OK")
@@ -345,7 +341,7 @@ fun SearchBox(viewModel: MainViewModel) {
 
                 Row(
                     modifier = Modifier
-                        .padding(horizontal = 30.dp)
+                        .padding(horizontal = 20.dp)
                         .fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
@@ -358,6 +354,7 @@ fun SearchBox(viewModel: MainViewModel) {
                             magnitudeValue = it
                         },
                         modifier = Modifier
+                            .padding(start = 10.dp)
                             .fillMaxWidth(),
                         steps = 10,
                         thumbDisplay = { (it * 10).toInt().toString() }
@@ -367,24 +364,29 @@ fun SearchBox(viewModel: MainViewModel) {
 
                 Button(
                     onClick = {
-                        // 86400000 fark mili saniye her gun arasinda
-
-                        viewModel.getFilteredHomeData(
-                            startTime = convertDateWithoutHours(
-                                selectedDateEpoch.toString()
-                            ),
-                            endTime = convertDateWithoutHours(
-                                (selectedDateEpoch.plus(
-                                    86400000
-                                )).toString()
-                            ),
-                            minMagnitude = (magnitudeValue * 10).toString()
-                        )
+                        if (dateState.selectedDateMillis == null) {
+                            viewModel.getSplashData(
+                                startTime = getToday(),
+                                minMagnitude = (magnitudeValue * 10).toString()
+                            )
+                        } else {
+                            viewModel.getFilteredHomeData(
+                                startTime = convertDateWithoutHours(
+                                    selectedDateEpoch.toString()
+                                ),
+                                endTime = convertDateWithoutHours(
+                                    (selectedDateEpoch.plus(
+                                        86400000
+                                    )).toString()
+                                ),
+                                minMagnitude = (magnitudeValue * 10).toString()
+                            )
+                        }
                     }, shape = RoundedCornerShape(50),
                     colors = ButtonDefaults.buttonColors(containerColor = buttonColor)
                 )
                 {
-                    Text(text = "Go")
+                    Text(text = "Search")
                 }
             }
         }

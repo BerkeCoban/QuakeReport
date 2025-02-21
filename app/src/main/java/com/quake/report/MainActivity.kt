@@ -5,6 +5,7 @@ import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -30,18 +31,14 @@ class MainActivity : ComponentActivity() {
     private var isCountDataFetched: Boolean = false
     private var isFourWeeksFetched: Boolean = false
     private var isMonthlyCountDataFetched: Boolean = false
-    // https://coolors.co/palettes/maps palette
 
-    // cluster konusu  mapte marker basinca default bi gorunum var onu belki gruplarda kullanabiliriz
     // geri butonu ile splashe dönmemeli.
     // uygulama ikon
     // bazen sanki count data fetch olmuyor sonuncu istek belki bunu kontrol et.
     // pull to refresh liste sayfasina olabilir
     // kasmassa mapteki ikonlara animasyon
-    // stateler duruyor mu mesala map ekraninda hide dedi gitti geldi
-    // basliga butun dunyadaki count data oldugunu belirt
-    // sonra izlede publish etmeden once video likeladim play store atmak icin
     // splashte belli bir sure kalirsa uyari mesaji bas
+    // renkleri degis  // https://coolors.co/palettes/maps palette
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -107,8 +104,7 @@ class MainActivity : ComponentActivity() {
         }
 
         viewModel.getSplashData(
-            startTime = getYesterday(),
-            endTime = getToday(),
+            startTime = getToday(),
             minMagnitude = "3"
         )
     }
@@ -173,6 +169,18 @@ class MainActivity : ComponentActivity() {
         if (isTodayFetched && isCountDataFetched && isFourWeeksFetched && isMonthlyCountDataFetched) {
             navController.navigate(route = Screen.Home.route)
         }
+    }
+
+    fun test(
+        ui: @Composable () -> Unit ) {
+        val addition: (Int, Int) -> Int = { a, b ->
+            a+b
+        }
+        hg(addition)
+    }
+
+    fun hg(test: (Int, Int) -> Int) {
+        test(1,2)
     }
 
     companion object {

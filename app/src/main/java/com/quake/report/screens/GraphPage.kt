@@ -74,6 +74,7 @@ fun BottomNavGraphPage(action: () -> Unit) {
     //  getLastFourWeekDates getLastSixMonths getLastWeek
     // 3 grafik yapariz 1 tane line graph 4 hafta verisi
     // basliklar ekle, tooltip, en alta tiklayinca gosterildigini belirt.
+    // basliga butun dunyadaki count data oldugunu belirt
 
     val context = LocalContext.current
     val data = MainActivity.countList

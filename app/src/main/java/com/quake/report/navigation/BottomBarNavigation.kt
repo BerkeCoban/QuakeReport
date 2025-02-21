@@ -11,6 +11,7 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.saveable.autoSaver
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -45,8 +46,16 @@ fun BottomBarNavigation(navController: NavHostController) {
                 BottomNavigationItem(
                     selected = currentRoute == Screen.BottomNavHome.route,
                     onClick = {
-                        navController.navigate(route = Screen.BottomNavHome.route)
+                        navController.navigate(route = Screen.BottomNavHome.route) {
+                            navController.graph.startDestinationRoute?.let { homeScreen ->
+                                popUpTo(homeScreen) {
+                                    saveState = true
+                                }
+                                restoreState = true
+                                launchSingleTop = true
 
+                            }
+                        }
                     },
                     icon = {
                         if (currentRoute == Screen.BottomNavHome.route) {
@@ -68,7 +77,16 @@ fun BottomBarNavigation(navController: NavHostController) {
                 BottomNavigationItem(
                     selected = currentRoute == Screen.BottomNavGraph.route,
                     onClick = {
-                        navController.navigate(route = Screen.BottomNavGraph.route)
+                        navController.navigate(route = Screen.BottomNavGraph.route) {
+                            navController.graph.startDestinationRoute?.let { homeScreen ->
+                                popUpTo(homeScreen) {
+                                    saveState = true
+                                }
+                                restoreState = true
+                                launchSingleTop = true
+
+                            }
+                        }
                     },
                     icon = {
                         if (currentRoute == Screen.BottomNavGraph.route) {
@@ -89,7 +107,16 @@ fun BottomBarNavigation(navController: NavHostController) {
                 BottomNavigationItem(
                     selected = currentRoute == Screen.BottomNavList.route,
                     onClick = {
-                        navController.navigate(route = Screen.BottomNavList.route)
+                        navController.navigate(route = Screen.BottomNavList.route) {
+                            navController.graph.startDestinationRoute?.let { homeScreen ->
+                                popUpTo(homeScreen) {
+                                    saveState = true
+                                }
+                                restoreState = true
+                                launchSingleTop = true
+
+                            }
+                        }
                     },
                     icon = {
                         if (currentRoute == Screen.BottomNavList.route) {
