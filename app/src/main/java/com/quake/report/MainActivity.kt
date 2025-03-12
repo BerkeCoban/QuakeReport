@@ -5,11 +5,6 @@ import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.quake.report.data.ResponseMapper
@@ -20,8 +15,6 @@ import com.quake.report.util.getLastFourWeekDates
 import com.quake.report.util.getLastWeek
 import com.quake.report.util.getLastSixMonths
 import com.quake.report.util.getToday
-import com.quake.report.util.getYesterday
-import org.osmdroid.util.GeoPoint
 
 class MainActivity : ComponentActivity() {
     private val viewModel: MainViewModel by viewModels()
@@ -39,6 +32,8 @@ class MainActivity : ComponentActivity() {
     // kasmassa mapteki ikonlara animasyon
     // splashte belli bir sure kalirsa uyari mesaji bas
     // renkleri degis  // https://coolors.co/palettes/maps palette
+
+    // main activity deki staticleri view model uzerinden alabiliriz
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -171,24 +166,11 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    fun test(
-        ui: @Composable () -> Unit ) {
-        val addition: (Int, Int) -> Int = { a, b ->
-            a+b
-        }
-        hg(addition)
-    }
-
-    fun hg(test: (Int, Int) -> Int) {
-        test(1,2)
-    }
-
     companion object {
         var splashData: ArrayList<UiResponse> = arrayListOf()
         var countList: ArrayList<Int> = arrayListOf()
         var fourWeeksCountList: ArrayList<Int> = arrayListOf()
         var monthlyCountList: ArrayList<Int> = arrayListOf()
-        var dialogGeoPoint = GeoPoint(10.0, 10.0)
     }
 
 }

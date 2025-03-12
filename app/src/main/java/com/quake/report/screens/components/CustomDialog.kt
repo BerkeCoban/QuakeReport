@@ -22,22 +22,23 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.quake.report.MainActivity
 import com.quake.report.R
 import com.quake.report.osm.MarkerLabeled
 import com.quake.report.osm.OpenStreetMap
 import com.quake.report.osm.rememberCameraState
 import com.quake.report.osm.rememberMarkerState
 import com.quake.report.osm.rememberOverlayManagerState
+import org.osmdroid.util.GeoPoint
 
 @Composable
 fun CustomDialog(
+    coordinates: GeoPoint,
     onDismissRequest: () -> Unit
 ) {
 
     val context = LocalContext.current
     val cameraState = rememberCameraState {
-        geoPoint = MainActivity.dialogGeoPoint
+        geoPoint = coordinates
         zoom = 0.0
     }
     val overlayManagerState = rememberOverlayManagerState()
@@ -67,14 +68,14 @@ fun CustomDialog(
                 ) {
                     MarkerLabeled(
                         state = rememberMarkerState(
-                            geoPoint = MainActivity.dialogGeoPoint,
+                            geoPoint = coordinates,
                             rotation = 0f
                         ),
                         icon = pinIcon,
                         //title = markerData.title,
                         //snippet = markerData.place,
-                       // label = markerData.magnitude.toString(),
-                       // labelProperties = labelProperties.value
+                        // label = markerData.magnitude.toString(),
+                        // labelProperties = labelProperties.value
                     )
                 }
                 Column(

@@ -4,6 +4,7 @@ import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.drawable.Drawable
 import android.location.Location
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -62,7 +63,6 @@ import com.quake.report.ui.theme.lightYellow
 import com.quake.report.util.Constants.CLUSTER_RANGE
 import com.quake.report.util.convertDateWithoutHours
 import com.quake.report.util.getToday
-import com.quake.report.util.getYesterday
 import com.quake.report.util.round
 import org.osmdroid.util.GeoPoint
 
@@ -77,8 +77,9 @@ fun MarkerPage() {
     // ustune basildiginda siddetler gosterilebilir, ayrica basildigindaki ui duzelt 168
 
     // marker tasarimi ve ustune basinca cikan dialog grup icin kullanilabilir
+    // mag goster basinca grup olanlarda en kolay yol
 
-
+    // onceki gunleri takvimde kapat bugun ve ilerisi tiklanabilsin
     // https://stackoverflow.com/questions/75377259/how-to-change-datepicker-dialog-color-in-jetpack-compose
 
     // butona surekli basilmasin istek atma olayi
@@ -89,6 +90,11 @@ fun MarkerPage() {
     // buradaki data ile liste datasini karsilastir, bi baska cozum bos gostermek data yoksa markerlari silmek,
     // liste ekraninda da empty view
 
+    // search basildi bos data geldiginde hicbirsey guncellenmiyor gibi duruyor
+    // list ekraninda ve mapte eski data gozukuyor
+
+
+    BackHandler(true) {}
     val overlayManagerState = rememberOverlayManagerState()
     val context = LocalContext.current
 

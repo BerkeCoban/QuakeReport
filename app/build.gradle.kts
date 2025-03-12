@@ -79,7 +79,6 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-livedata:2.3.1")
 
 
-    implementation("io.github.dautovicharis:charts:1.2.0")
 
     implementation("com.github.jaikeerthick:Composable-Graphs:v1.2.3")
 

@@ -2,12 +2,14 @@ package com.quake.report.screens
 
 import android.content.Intent
 import android.net.Uri
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,22 +19,32 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.Send
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,6 +57,8 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -58,29 +72,31 @@ import com.quake.report.ui.theme.lightYellow
 import com.quake.report.ui.theme.buttonColor
 import com.quake.report.ui.theme.magColor
 import com.quake.report.ui.theme.magnitudeColor
+import com.quake.report.ui.theme.orange
+import com.quake.report.ui.theme.red
+import com.quake.report.ui.theme.splashYellow
 import com.quake.report.util.convertDate
 import com.quake.report.util.convertDateHours
 import com.quake.report.util.round
+import com.quake.report.util.subStringBeforeComma
+import com.quake.report.util.subStringDetail
+import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
 
 @Composable
 fun BottomNavListPage(action: () -> Unit) {
 
     // empty view
-    // yukari tarih kutucugu vs yada direk home daki daha gosterilsin filtrelenebilir
-    // listede yuksek siddet yukarda olabilir
-    // kartin boyutu sabit olabilir cunku yuvalak oturmaz vs. gerek varmi kontrol et
-    // card frame
-    // arada sigmayan title oluyor lite viewda texti tek satir yap yada text size kucult
-    // lite view ortala titlei
-    // bir uyari yazilabilir mapteki data burada gozukuyor gibi
-    // switch yukarda sabit kalabilir assagi indikce dursun yukarda
-    // show on map ve details icon
 
-    val data = MainActivity.splashData
+    // phase 2 filtreleme asc desc siralama mag
+
+    var url by remember { mutableStateOf("") }
+    var coordinates by remember { mutableStateOf(GeoPoint(0.0, 0.0)) }
+    val data = MainActivity.splashData.sortedWith(compareBy { it.magnitude }).reversed()
     val context = LocalContext.current
     var showDialog by remember { mutableStateOf(false) }
-    var isLiteViews by remember { mutableStateOf(false) }
+    var showAlertDialog by remember { mutableStateOf(false) }
+    var isLiteViews by rememberSaveable { mutableStateOf(false) }
     val radius = with(LocalDensity.current) { 10.dp.toPx() }
     val cornerRadiusDp = 50.dp
     val cornerRadius = with(LocalDensity.current) { cornerRadiusDp.toPx() }
@@ -116,67 +132,57 @@ fun BottomNavListPage(action: () -> Unit) {
 
 
     CardList(items = arrayListOf<@Composable () -> Unit>().apply {
-        add {
-            Row {
-                Button( modifier = Modifier
-                    .height(100.dp)
-                    .width(100.dp),
-                    onClick = {
-                        isLiteViews = !isLiteViews
-                    }) {
-                    Text(text = "switch")
-                }
-            }
-        }
         for (item: UiResponse in data) {
             add {
-                val infiniteTransition = rememberInfiniteTransition(label = "")
-                val scale by infiniteTransition.animateFloat(
-                    initialValue = 1f,
-                    targetValue = 1.2f,
-                    animationSpec = infiniteRepeatable(
-                        animation = tween(
-                            durationMillis = when {
-                                item.magnitude!! > 6 -> 200
-                                item.magnitude!! > 5 -> 300
-                                item.magnitude!! > 4 -> 500
-                                item.magnitude!! > 3 -> 700
-                                item.magnitude!! > 1 -> 1000
-                                else -> 1000
-                            }
-                        ),
-                        repeatMode = RepeatMode.Reverse
-                    ), label = ""
-                )
-
                 CustomCard(
-                    title = item.place,
-                    detail = item.title,
+                    title = item.place?.subStringBeforeComma(),
+                    detail = item.title?.subStringDetail(),
                     time = item.time,
                     lastUpdated = item.lastUpdated,
                     mag = item.magnitude.toString(),
                     doubleMag = item.magnitude,
                     shape = shape,
                     url = item.detailUrl,
-                    isLiteMode = isLiteViews
-                ) {
-                    if (item.latitude != null && item.longitude != null) {
-                        MainActivity.dialogGeoPoint =
-                            GeoPoint(item.latitude!!, item.longitude!!)
-                        showDialog = true
-                    } else {
-                        Toast.makeText(context, "Location is missing.", Toast.LENGTH_LONG)
-                            .show()
+                    isLiteMode = isLiteViews,
+                    onMapOpen = {
+                        if (item.latitude != null && item.longitude != null) {
+                            try {
+                                coordinates = GeoPoint(item.latitude!!, item.longitude!!)
+                                showDialog = true
+                            } catch (e: Exception) {
+                                Log.d("e:", "geopoint null.")
+                            }
+                        } else {
+                            Toast.makeText(context, "Location is missing.", Toast.LENGTH_LONG)
+                                .show()
+                        }
+                    },
+                    onDetailOpen = { itemUrl ->
+                        url = itemUrl
+                        showAlertDialog = true
                     }
-                }
+                )
             }
         }
-    })
+    }) {
+        isLiteViews = !isLiteViews
+    }
 
     when {
         showDialog -> {
             CustomDialog(
+                coordinates,
                 onDismissRequest = { showDialog = false }
+            )
+        }
+
+        showAlertDialog -> {
+            CustomAlertDialog(
+                onDismiss = { showAlertDialog = false },
+                onApply = {
+                    showAlertDialog = false
+                    context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                }
             )
         }
     }
@@ -184,19 +190,85 @@ fun BottomNavListPage(action: () -> Unit) {
 
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CardList(
-    items: ArrayList<@Composable () -> Unit>
+    items: ArrayList<@Composable () -> Unit>,
+    onSwitchChecked: () -> Unit
 ) {
+    val mState = remember { LazyListState() }
+    val coroutineScope = rememberCoroutineScope()
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .background(lightYellow)
+            .background(lightYellow),
+        state = mState
     ) {
+        item {
+            Text(
+                "Update data from home page to see the details here.", modifier = Modifier
+                    .padding(30.dp)
+                    .fillMaxWidth()
+                    .background(lightYellow),
+                fontWeight = FontWeight.Bold
+            )
+        }
+        stickyHeader {
+            Row(
+                horizontalArrangement = Arrangement.End,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(end = 20.dp)
+                    .background(lightYellow)
+            ) {
+                Text(
+                    "Lite Views", modifier = Modifier.padding(end = 15.dp, top = 15.dp),
+                    fontWeight = FontWeight.Bold
+                )
+                CustomSwitch {
+                    val firstVisibleItem = mState.firstVisibleItemIndex
+                    onSwitchChecked.invoke()
+                    coroutineScope.launch {
+                        mState.animateScrollToItem(firstVisibleItem)
+                    }
+                }
+            }
+        }
         items(items) { chartItem ->
             chartItem()
         }
     }
+}
+
+@Composable
+fun CustomSwitch(isChecked: () -> Unit) {
+    var checked by rememberSaveable { mutableStateOf(false) }
+    Switch(
+        modifier = Modifier
+            .semantics { contentDescription = "cd" },
+        checked = checked,
+        onCheckedChange = {
+            checked = it
+            isChecked.invoke()
+        },
+        thumbContent = {
+            if (checked) {
+                Icon(
+                    imageVector = Icons.Filled.Check,
+                    contentDescription = null,
+                    modifier = Modifier.size(SwitchDefaults.IconSize),
+                )
+            }
+        },
+        colors = SwitchDefaults.colors(
+            checkedThumbColor = splashYellow,
+            checkedTrackColor = red,
+            uncheckedThumbColor = splashYellow,
+            uncheckedTrackColor = red,
+            uncheckedBorderColor = red,
+            checkedBorderColor = red
+        ),
+    )
 }
 
 @Composable
@@ -208,7 +280,8 @@ fun CustomCard(
     doubleMag: Double?,
     url: String?,
     isLiteMode: Boolean,
-    onDialogOpen: () -> Unit,
+    onMapOpen: () -> Unit,
+    onDetailOpen: (String) -> Unit
 ) {
 
     val context = LocalContext.current
@@ -259,12 +332,22 @@ fun CustomCard(
                 horizontalAlignment = Alignment.Start,
                 modifier = Modifier.padding(10.dp)
             ) {
-                Text(
-                    text = title.toString(),
-                    fontSize = 15.sp,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold,
-                )
+                Row(modifier = Modifier.padding(top = 4.dp)) {
+                    Icon(
+                        imageVector = Icons.Filled.LocationOn, contentDescription = "",
+                        modifier = Modifier
+                            .width(20.dp)
+                            .height(20.dp),
+                        tint = orange
+                    )
+                    Text(
+                        text = title.toString(),
+                        modifier = Modifier.padding(start = 5.dp, top = 3.dp),
+                        fontSize = 15.sp,
+                        color = Color.White,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
                 Text(
                     modifier = Modifier.padding(top = 10.dp),
                     text = detail.toString(),
@@ -296,7 +379,7 @@ fun CustomCard(
             ) {
                 Button(
                     onClick = {
-                        onDialogOpen.invoke()
+                        onMapOpen.invoke()
                     },
                     modifier = Modifier
                         .weight(0.5f)
@@ -305,7 +388,7 @@ fun CustomCard(
                     colors = ButtonDefaults.buttonColors(containerColor = buttonColor)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Favorite,
+                        imageVector = Icons.Default.LocationOn,
                         contentDescription = "Icon",
                         tint = Color.White,
                         modifier = Modifier.padding(end = 5.dp)
@@ -314,7 +397,7 @@ fun CustomCard(
                 }
                 Button(
                     onClick = {
-                        context.startActivity(intent)
+                        onDetailOpen.invoke(url.toString())
                     },
                     modifier = Modifier
                         .weight(0.5f)
@@ -323,7 +406,7 @@ fun CustomCard(
                     colors = ButtonDefaults.buttonColors(containerColor = buttonColor)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Favorite,
+                        imageVector = Icons.Default.Send,
                         contentDescription = "Icon",
                         tint = Color.White,
                         modifier = Modifier.padding(end = 5.dp)
@@ -379,4 +462,41 @@ fun Modifier.circleBackground(color: Color, padding: Dp): Modifier {
     }
 
     return this then backgroundModifier then layoutModifier
+}
+
+@Composable
+fun CustomAlertDialog(onDismiss: () -> Unit, onApply: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = {
+            onDismiss.invoke()
+        },
+        title = { Text(text = "Warning!") },
+        text = { Text(text = "Please Click Ok to open the web browser.") },
+        confirmButton = {
+            Button(
+                onClick = {
+                    onApply.invoke()
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = orange)
+            ) {
+                Text(
+                    text = "OK",
+                    color = Color.White
+                )
+            }
+        },
+        dismissButton = {
+            Button(
+                onClick = {
+                    onDismiss.invoke()
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = orange)
+            ) {
+                Text(
+                    text = "Cancel",
+                    color = Color.White
+                )
+            }
+        }
+    )
 }

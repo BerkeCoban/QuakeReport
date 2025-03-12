@@ -62,19 +62,22 @@ fun ChartDemoItems(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BottomNavGraphPage(action: () -> Unit) {
-// altina baslik text yazilabilir haftalik rapor gibi
+
+
     // en uste belki filtreleme yada tekrar istek atacak bir fonksiyon
-// uzerine tiklama aksiyonu belirtilebilir
-    // getGraphNames() gunleri cekmek icin tabloya yaz
-    // grafik verisine tiklayinca toast ile count goster yada kucuk dialog gibi birsey olabilir
+    // uzerine tiklama aksiyonu belirtilebilir
+
+
+    //https://medium.com/@MrAndroid/tooltips-in-jetpack-compose-d7667cb5ae0d
+    // tool tip grafige basildiginda
+    // https://github.com/skydoves/Balloon#balloon-in-jetpack-compose-1
+    // bu da library daha kolay olabilir
 
 
     // count list ve getLastweek tarihler ve datalar direk oturuyo index 0 ile index 0
     // count datalari ve tarihler oturuyor start  time olarak, ilk tablodu gunleri kullanabilirizx
-    //  getLastFourWeekDates getLastSixMonths getLastWeek
-    // 3 grafik yapariz 1 tane line graph 4 hafta verisi
+
     // basliklar ekle, tooltip, en alta tiklayinca gosterildigini belirt.
-    // basliga butun dunyadaki count data oldugunu belirt
 
     val context = LocalContext.current
     val data = MainActivity.countList
@@ -99,8 +102,6 @@ fun BottomNavGraphPage(action: () -> Unit) {
         BarData(x = getGraphNames()[6], y = data[6])
     )
 
-    // getLastSixMonths bu method ayin 1 inden itibaren alacak
-    // getLastSixMonthsNames bu method en son ay en sonda olacak.
     val monthData = listOf(
         BarData(x = getLastSixMonthsNames()[0], y = monthlyData[1]),
         BarData(x = getLastSixMonthsNames()[1], y = monthlyData[2]),
