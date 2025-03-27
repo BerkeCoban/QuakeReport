@@ -15,8 +15,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -73,9 +77,6 @@ fun MarkerPage() {
     val viewModel = viewModel<MainViewModel>()
 
 
-    // cluster olayini cozduk , ancak tek marker olarak ekledigimiz grupta, kalamnlari da goster
-    // ustune basildiginda siddetler gosterilebilir, ayrica basildigindaki ui duzelt 168
-
     // marker tasarimi ve ustune basinca cikan dialog grup icin kullanilabilir
     // mag goster basinca grup olanlarda en kolay yol
 
@@ -85,13 +86,16 @@ fun MarkerPage() {
     // butona surekli basilmasin istek atma olayi
     // loading cikarma servislerde
 
+    // uygulama acildi sadece mag degis bas gelen data farkli gibi tarih secmeden
+
 
     // TARIH secip go dedikten sonra veri gelmesse uyari goster eski data kalacaksa resetleme vs yapilabilir
     // buradaki data ile liste datasini karsilastir, bi baska cozum bos gostermek data yoksa markerlari silmek,
     // liste ekraninda da empty view
 
     // search basildi bos data geldiginde hicbirsey guncellenmiyor gibi duruyor
-    // list ekraninda ve mapte eski data gozukuyor
+
+    // cluster kontrol et tasarimi
 
 
     BackHandler(true) {}
@@ -160,18 +164,28 @@ fun MarkerPage() {
                                     label = markerData.magnitude?.round().toString(),
                                     labelProperties = labelProperties.value
                                 ) {
-                                    Column(
-                                        modifier = Modifier
-                                            .size(100.dp)
-                                            .background(
-                                                color = androidx.compose.ui.graphics.Color.Gray,
-                                                shape = RoundedCornerShape(7.dp)
-                                            ),
-                                        verticalArrangement = Arrangement.Center,
-                                        horizontalAlignment = Alignment.CenterHorizontally
-                                    ) {
-                                        Text(text = it.title)
-                                        Text(text = it.snippet, fontSize = 10.sp)
+                                    if (clusterIndexList[index]?.isNotEmpty() == true) {
+                                        val clusterGroup = clusterIndexList[index]
+                                        val clusterList = arrayListOf<UiResponse>()
+                                        clusterGroup?.forEach {
+                                            clusterList.add(splashData[it])
+                                        }
+                                        LazyColumn(
+                                            modifier = Modifier
+                                                .padding(10.dp)
+                                                .heightIn(0.dp, 250.dp)
+                                                .widthIn(0.dp, 350.dp)
+                                                .background(
+                                                    color = androidx.compose.ui.graphics.Color.White,
+                                                    shape = RoundedCornerShape(7.dp)
+                                                ),
+                                            verticalArrangement = Arrangement.Center,
+                                            horizontalAlignment = Alignment.CenterHorizontally
+                                        ) {
+                                            items(items = clusterList) {
+                                                Text(text = it.title.toString())
+                                            }
+                                        }
                                     }
                                 }
                             }

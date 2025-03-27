@@ -27,8 +27,11 @@ class MainActivity : ComponentActivity() {
 
     // geri butonu ile splashe dönmemeli.
     // uygulama ikon
-    // bazen sanki count data fetch olmuyor sonuncu istek belki bunu kontrol et.
-    // pull to refresh liste sayfasina olabilir
+
+    // bazen sanki count data fetch olmuyor sonuncu istek belki bunu kontrol et. olmadi error bas
+    // tekrar baslat vs
+
+
     // kasmassa mapteki ikonlara animasyon
     // splashte belli bir sure kalirsa uyari mesaji bas
     // renkleri degis  // https://coolors.co/palettes/maps palette
