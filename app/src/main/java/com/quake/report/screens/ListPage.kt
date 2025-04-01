@@ -39,7 +39,6 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -64,7 +63,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.offset
 import androidx.compose.ui.unit.sp
-import com.quake.report.MainActivity
 import com.quake.report.data.model.UiResponse
 import com.quake.report.screens.components.CustomDialog
 import com.quake.report.ui.theme.green1
@@ -73,26 +71,22 @@ import com.quake.report.ui.theme.buttonColor
 import com.quake.report.ui.theme.magColor
 import com.quake.report.ui.theme.magnitudeColor
 import com.quake.report.ui.theme.orange
-import com.quake.report.ui.theme.red
 import com.quake.report.ui.theme.splashYellow
 import com.quake.report.util.convertDate
 import com.quake.report.util.convertDateHours
 import com.quake.report.util.round
 import com.quake.report.util.subStringBeforeComma
+import com.quake.report.MainActivity.Companion.splashData
 import com.quake.report.util.subStringDetail
 import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
 
 @Composable
 fun BottomNavListPage(action: () -> Unit) {
-
-    // empty view
-
-    // phase 2 filtreleme asc desc siralama mag
-
+    // TODO: phase 2 filtreleme asc desc siralama mag, search
     var url by remember { mutableStateOf("") }
     var coordinates by remember { mutableStateOf(GeoPoint(0.0, 0.0)) }
-    val data = MainActivity.splashData.sortedWith(compareBy { it.magnitude }).reversed()
+    val data = splashData.sortedWith(compareBy { it.magnitude }).reversed()
     val context = LocalContext.current
     var showDialog by remember { mutableStateOf(false) }
     var showAlertDialog by remember { mutableStateOf(false) }
@@ -207,7 +201,7 @@ fun CardList(
         item {
             Text(
                 "Update data from home page to see the details here.", modifier = Modifier
-                    .padding(30.dp)
+                    .padding(start = 30.dp, end = 30.dp, top = 50.dp, bottom = 30.dp)
                     .fillMaxWidth()
                     .background(lightYellow),
                 fontWeight = FontWeight.Bold
@@ -262,11 +256,11 @@ fun CustomSwitch(isChecked: () -> Unit) {
         },
         colors = SwitchDefaults.colors(
             checkedThumbColor = splashYellow,
-            checkedTrackColor = red,
+            checkedTrackColor = orange,
             uncheckedThumbColor = splashYellow,
-            uncheckedTrackColor = red,
-            uncheckedBorderColor = red,
-            checkedBorderColor = red
+            uncheckedTrackColor = orange,
+            uncheckedBorderColor = orange,
+            checkedBorderColor = orange
         ),
     )
 }
@@ -477,7 +471,7 @@ fun CustomAlertDialog(onDismiss: () -> Unit, onApply: () -> Unit) {
                 onClick = {
                     onApply.invoke()
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = orange)
+                colors = ButtonDefaults.buttonColors(containerColor = buttonColor)
             ) {
                 Text(
                     text = "OK",
@@ -490,7 +484,7 @@ fun CustomAlertDialog(onDismiss: () -> Unit, onApply: () -> Unit) {
                 onClick = {
                     onDismiss.invoke()
                 },
-                colors = ButtonDefaults.buttonColors(containerColor = orange)
+                colors = ButtonDefaults.buttonColors(containerColor = buttonColor)
             ) {
                 Text(
                     text = "Cancel",

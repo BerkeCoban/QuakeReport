@@ -5,10 +5,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.quake.report.MainActivity.Companion
 import com.quake.report.data.ResponseMapper
 import com.quake.report.data.RetrofitInstance
 import com.quake.report.data.model.QuakeResponse
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
@@ -26,6 +27,20 @@ class MainViewModel : ViewModel() {
     private val _monthlyCountData = MutableLiveData<Int>()
     val monthlyCountData: LiveData<Int> = _monthlyCountData
 
+    private val _emptyData = MutableStateFlow(false)
+    val emptyData: StateFlow<Boolean> = _emptyData
+
+    private val _progressDialog = MutableStateFlow(false)
+    val progressDialog: StateFlow<Boolean> = _progressDialog
+
+    fun updateEmptyData(data: Boolean) {
+        _emptyData.value = data
+    }
+
+    fun updateProgressValue(data: Boolean) {
+        _progressDialog.value = data
+    }
+
 
     fun getSplashData(startTime: String, minMagnitude: String) {
         viewModelScope.launch {
@@ -35,10 +50,14 @@ class MainViewModel : ViewModel() {
                     minMagnitude = minMagnitude
                 )
                 if (response.features.isNotEmpty()) {
+                    MainActivity.splashData = ResponseMapper.map(response)
                     _splashData.postValue(response)
+                } else {
+                    _emptyData.value = true
                 }
             } catch (e: Exception) {
-                Log.d("error: ", e.toString())
+                // TODO: phase 2 use different dialog
+                _emptyData.value = true
             }
         }
     }
@@ -50,7 +69,7 @@ class MainViewModel : ViewModel() {
                     apiService.getCountsWithDates(startTime = startTime, endTime = endTime)
                 _countData.postValue(response.count!!)
             } catch (e: Exception) {
-                Log.d("error: ", e.toString())
+                _emptyData.value = true
             }
         }
     }
@@ -62,7 +81,7 @@ class MainViewModel : ViewModel() {
                     apiService.getCountsWithDates(startTime = startTime, endTime = endTime)
                 _secondCountData.postValue(response.count!!)
             } catch (e: Exception) {
-                Log.d("error: ", e.toString())
+                _emptyData.value = true
             }
         }
     }
@@ -74,7 +93,7 @@ class MainViewModel : ViewModel() {
                     apiService.getCountsWithDates(startTime = startTime, endTime = endTime)
                 _monthlyCountData.postValue(response.count!!)
             } catch (e: Exception) {
-                Log.d("error: ", e.toString())
+                _emptyData.value = true
             }
         }
     }
@@ -88,7 +107,7 @@ class MainViewModel : ViewModel() {
                 )
                 _countData.postValue(response.count!!)
             } catch (e: Exception) {
-                Log.d("error: ", e.toString())
+                _emptyData.value = true
             }
         }
     }
@@ -105,9 +124,11 @@ class MainViewModel : ViewModel() {
                     MainActivity.splashData = ResponseMapper.map(response)
                     _splashData.postValue(response)
 
+                } else {
+                    _emptyData.value = true
                 }
             } catch (e: Exception) {
-                Log.d("error: ", e.toString())
+                _emptyData.value = true
             }
         }
     }

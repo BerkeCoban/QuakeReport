@@ -1,6 +1,10 @@
 package com.quake.report.util
 
+import android.os.Build
 import android.text.format.DateFormat
+import androidx.annotation.RequiresApi
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SelectableDates
 import com.quake.report.util.Constants.DATE_FORMAT
 import com.quake.report.util.Constants.DATE_FORMAT_DAY
 import com.quake.report.util.Constants.DATE_FORMAT_MONTH
@@ -10,6 +14,12 @@ import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import kotlinx.datetime.todayIn
 
 
 fun getToday(): String {
@@ -126,4 +136,23 @@ fun convertDateWithoutHours(dateInMilliseconds: String): String {
         "yyyy-MM-dd",
         dateInMilliseconds.substringBefore("E").replace(".", "").toLong()
     ).toString()
+}
+
+
+fun fromEpochMillis(epochMillis: Long): LocalDate = Instant.fromEpochMilliseconds(epochMillis)
+    .toLocalDateTime(TimeZone.UTC)
+    .date
+
+fun today(): LocalDate = Clock.System.todayIn(TimeZone.currentSystemDefault())
+
+@OptIn(ExperimentalMaterial3Api::class)
+object PastOrPresentSelectableDates: SelectableDates {
+    override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+        return fromEpochMillis(utcTimeMillis) <= today()
+    }
+
+    @ExperimentalMaterial3Api
+    override fun isSelectableYear(year: Int): Boolean {
+        return true
+    }
 }

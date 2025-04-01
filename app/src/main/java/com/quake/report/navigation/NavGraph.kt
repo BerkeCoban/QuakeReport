@@ -9,7 +9,8 @@ import com.quake.report.screens.SplashPage
 @Composable
 fun SetupNavGraph(
     navController: NavHostController,
-    navControllerBottom: NavHostController
+    navControllerBottom: NavHostController,
+    finish: () -> Unit
 ) {
     NavHost(
         navController = navController,
@@ -18,7 +19,9 @@ fun SetupNavGraph(
         composable(
             route = Screen.Splash.route
         ) {
-            SplashPage()
+            SplashPage {
+                finish.invoke()
+            }
         }
         composable(
             route = Screen.Home.route,

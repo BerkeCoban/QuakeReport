@@ -35,10 +35,16 @@ import com.jaikeerthick.composable_graphs.composables.line.style.LineGraphFillTy
 import com.jaikeerthick.composable_graphs.composables.line.style.LineGraphStyle
 import com.jaikeerthick.composable_graphs.composables.line.style.LineGraphVisibility
 import com.quake.report.MainActivity
+import com.quake.report.ui.theme.buttonColor
+import com.quake.report.ui.theme.green1
 import com.quake.report.ui.theme.lightYellow
+import com.quake.report.ui.theme.magColor
+import com.quake.report.ui.theme.magnitudeColor
 import com.quake.report.ui.theme.yellow2
 import com.quake.report.ui.theme.orange
+import com.quake.report.ui.theme.pinTextColor
 import com.quake.report.ui.theme.red
+import com.quake.report.ui.theme.yellow1
 import com.quake.report.util.getGraphNames
 import com.quake.report.util.getLastFourWeekDates
 import com.quake.report.util.getLastSixMonthsNames
@@ -144,7 +150,7 @@ fun BottomNavGraphPage(action: () -> Unit) {
                         fillType = BarGraphFillType.Gradient(
                             Brush.verticalGradient(
                                 listOf(
-                                    red, orange
+                                    buttonColor, green1
                                 )
                             )
                         )
@@ -174,10 +180,10 @@ fun BottomNavGraphPage(action: () -> Unit) {
                 data = fourWeeksData,
                 style = LineGraphStyle(
                     LineGraphColors(
-                        lineColor = red,
-                        pointColor = red,
-                        crossHairColor = Color.Red,
-                        clickHighlightColor = yellow2,
+                        lineColor = magColor,
+                        pointColor = magColor,
+                        crossHairColor = magColor,
+                        clickHighlightColor = magColor,
                         xAxisTextColor = Color.Black,
                         yAxisTextColor = Color.Black,
                         fillType =
@@ -187,7 +193,7 @@ fun BottomNavGraphPage(action: () -> Unit) {
                         LineGraphFillType.Gradient(
                             brush = Brush.verticalGradient(
                                 listOf(
-                                    orange, yellow2
+                                    buttonColor, green1
                                 )
                             )
                         )
@@ -225,7 +231,7 @@ fun BottomNavGraphPage(action: () -> Unit) {
                         fillType = BarGraphFillType.Gradient(
                             Brush.verticalGradient(
                                 listOf(
-                                    red, orange
+                                    buttonColor, green1
                                 )
                             )
                         )

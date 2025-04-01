@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "com.quake.report"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -78,10 +78,8 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:1.0.0-alpha07")
     implementation ("androidx.lifecycle:lifecycle-livedata:2.3.1")
 
-
-
     implementation("com.github.jaikeerthick:Composable-Graphs:v1.2.3")
-
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.31.2-alpha")
 
 }

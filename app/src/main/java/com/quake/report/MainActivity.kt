@@ -25,18 +25,7 @@ class MainActivity : ComponentActivity() {
     private var isFourWeeksFetched: Boolean = false
     private var isMonthlyCountDataFetched: Boolean = false
 
-    // geri butonu ile splashe dönmemeli.
     // uygulama ikon
-
-    // bazen sanki count data fetch olmuyor sonuncu istek belki bunu kontrol et. olmadi error bas
-    // tekrar baslat vs
-
-
-    // kasmassa mapteki ikonlara animasyon
-    // splashte belli bir sure kalirsa uyari mesaji bas
-    // renkleri degis  // https://coolors.co/palettes/maps palette
-
-    // main activity deki staticleri view model uzerinden alabiliriz
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,7 +36,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             navController = rememberNavController()
             navControllerBottom = rememberNavController()
-            SetupNavGraph(navController = navController, navControllerBottom = navControllerBottom)
+            SetupNavGraph(navController = navController, navControllerBottom = navControllerBottom) {
+                finish()
+            }
         }
     }
 
