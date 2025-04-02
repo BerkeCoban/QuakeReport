@@ -465,7 +465,7 @@ fun CustomAlertDialog(onDismiss: () -> Unit, onApply: () -> Unit) {
             onDismiss.invoke()
         },
         title = { Text(text = "Warning!") },
-        text = { Text(text = "Please Click Ok to open the web browser.") },
+        text = { Text(text = "Please click 'OK' to see the details on web browser.") },
         confirmButton = {
             Button(
                 onClick = {
