@@ -3,6 +3,7 @@ package com.quake.report.screens
 import android.graphics.Paint
 import android.graphics.drawable.Drawable
 import android.location.Location
+import android.view.WindowInsets
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
@@ -16,8 +17,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.mandatorySystemGesturesPadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -80,6 +85,7 @@ import com.quake.report.util.convertDateWithoutHours
 import com.quake.report.util.getToday
 import com.quake.report.util.round
 import org.osmdroid.util.GeoPoint
+import kotlin.math.ceil
 
 
 @Composable
@@ -106,7 +112,6 @@ fun MarkerPage() {
             )
         )
     }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
